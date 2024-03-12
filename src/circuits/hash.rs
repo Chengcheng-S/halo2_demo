@@ -1,8 +1,8 @@
 use crate::chips::hash::{HashChip, HashConfig};
 use halo2_proofs::{
-    circuit::{Value, Layouter, SimpleFloorPlanner},
+    circuit::{Layouter, SimpleFloorPlanner, Value},
     halo2curves::ff::PrimeField,
-    plonk::{Circuit, ConstraintSystem,Error},
+    plonk::{Circuit, ConstraintSystem, Error},
 };
 
 #[derive(Debug, Default)]

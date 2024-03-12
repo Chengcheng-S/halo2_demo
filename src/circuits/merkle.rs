@@ -1,8 +1,8 @@
 use crate::chips::merkle::{MerkleChip, MerkleConfig};
 use halo2_proofs::{
-    circuit::{Value, Layouter, SimpleFloorPlanner},
+    circuit::{Layouter, SimpleFloorPlanner, Value},
     halo2curves::ff::PrimeField,
-    plonk::{Circuit, ConstraintSystem,Error},
+    plonk::{Circuit, ConstraintSystem, Error},
 };
 
 #[derive(Debug, Default)]
@@ -43,13 +43,13 @@ impl<F: PrimeField> Circuit<F> for MerkleCircuit<F> {
         layouter.constrain_instance(leaf_cell.cell(), config.instance, 0)?;
         let merkle_chip = MerkleChip::construct(config);
         let root_cell = merkle_chip.prove_tree_root(
-            layouter.namespace(||"prove tree"),
+            layouter.namespace(|| "prove tree"),
             leaf_cell,
             self.path_elements.clone(),
             self.path_indices.clone(),
         )?;
 
-        layouter.constrain_instance(root_cell.cell(), config.instance,1)?;
+        layouter.constrain_instance(root_cell.cell(), config.instance, 1)?;
         Ok(())
     }
 }

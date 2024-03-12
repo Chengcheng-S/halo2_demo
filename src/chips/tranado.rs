@@ -62,10 +62,10 @@ impl<F: PrimeField> TornadoChip<F> {
             || "compute hash",
             |mut region| {
                 let left_cell =
-                    region.assign_advice(|| "value 1", self.config.advice[0], 0, ||left_value)?;
+                    region.assign_advice(|| "value 1", self.config.advice[0], 0, || left_value)?;
 
                 let right_cell =
-                    region.assign_advice(|| "value 2", self.config.advice[1], 0,|| right_value)?;
+                    region.assign_advice(|| "value 2", self.config.advice[1], 0, || right_value)?;
 
                 Ok((left_cell, right_cell))
             },

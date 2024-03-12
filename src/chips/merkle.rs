@@ -1,10 +1,10 @@
 use crate::chips::hash::{HashChip, HashConfig};
 
 use halo2_proofs::{
-    circuit::{AssignedCell ,Layouter, Value},
-    plonk::{Advice, Column, ConstraintSystem, Error, Instance, Selector,Expression},
-    poly::Rotation,
+    circuit::{AssignedCell, Layouter, Value},
     halo2curves::ff::PrimeField,
+    plonk::{Advice, Column, ConstraintSystem, Error, Expression, Instance, Selector},
+    poly::Rotation,
 };
 use std::marker::PhantomData;
 
@@ -131,7 +131,7 @@ impl<F: PrimeField> MerkleChip<F> {
                     1,
                     || right,
                 )?;
-               Ok((left_cell,right_cell))
+                Ok((left_cell, right_cell))
             },
         )?;
         let hash_chip = HashChip::construct(self.config.hash_config);
