@@ -1,8 +1,6 @@
 mod chip;
 use chip::MyCircuit;
 
-
-
 #[allow(clippy::many_single_char_names)]
 fn main() {
     use rand_core::OsRng;
@@ -29,20 +27,11 @@ fn main() {
         c: Value::known(c),
     };
 
-    // Arrange the public input. We expose the multiplication result in row 0
-    // of the instance column, so we position it there in our public inputs.
-    let mut public_inputs = vec![d];
 
-    // Given the correct public input, our circuit will verify.
-    let prover = MockProver::run(k, &circuit, vec![public_inputs.clone()]).unwrap();
-    assert_eq!(prover.verify(), Ok(()));
-
-
-    
     let root = BitMapBackend::new("layout.png", (1024, 768)).into_drawing_area();
     root.fill(&WHITE).unwrap();
     let root = root
-        .titled("Example Circuit Layout", ("sans-serif", 60))
+        .titled("My Circuit Layout", ("sans-serif", 60))
         .unwrap();
 
     halo2_proofs::dev::CircuitLayout::default()
@@ -55,6 +44,18 @@ fn main() {
         // The first argument is the size parameter for the circuit.
         .render(5, &circuit, &root)
         .unwrap();
+
+
+    // Arrange the public input. We expose the multiplication result in row 0
+    // of the instance column, so we position it there in our public inputs.
+    let  public_inputs = vec![d];
+
+    // Given the correct public input, our circuit will verify.
+    let prover = MockProver::run(k, &circuit, vec![public_inputs.clone()]).unwrap();
+    assert_eq!(prover.verify(), Ok(()));
+
+    
+    
 
     // If we try some other public input, the proof will fail!
     // public_inputs[0] += Fp::one();

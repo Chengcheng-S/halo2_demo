@@ -20,6 +20,6 @@ cargo run
 sleep 5
 
 echo "uninstall rust env"
-rustup self uninstall
+# rustup self uninstall
 source ~/.bashrc
 echo "plase restart your terminal && run rustc -V or cargo -V check the rust uninstall"
