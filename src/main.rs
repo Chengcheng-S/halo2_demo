@@ -293,6 +293,7 @@ impl<F: Field> Circuit<F> for MyCiruit<F> {
 }
 
 use halo2_proofs::{dev::MockProver, pasta::Fp};
+use simple_example::show_main;
 
 fn main() {
     ////  The number of rows in our circuit cannot exceed 2^k. Since our example
@@ -321,8 +322,11 @@ fn main() {
     let prover = MockProver::run(k, &circuit, vec![public_inputs]).unwrap();
     assert!(prover.verify().is_err());
 
+    // fibonacci example
+    show_main::fibonacci_example1();
     #[cfg(feature = "dev-graph")]
     {
+        show_main::plot_fibonacci1();
         use plotters::prelude::*;
         let drawing_area = BitMapBackend::new("layout.png", (1024, 768)).into_drawing_area();
         drawing_area.fill(&WHITE).unwrap();
@@ -335,7 +339,9 @@ fn main() {
             .view_width(0..2)
             .view_height(0..16)
             //hide labels, which can be useful with smaller areas.
-            .show_labels(false)
+            .show_labels(true)
+            .mark_equality_cells(true)
+            .show_equality_constraints(true)
             // Render the circuit onto your area!
             // The first argument is the size parameter for the circuit.
             .render(k, &circuit, &drawing_area)
