@@ -10,7 +10,6 @@ use halo2_proofs::{
 
 /// load private number into circuit
 /// two number mul
-///
 
 trait NumericInstructions<F: Field>: Chip<F> {
     /// variable representing a number
@@ -158,7 +157,7 @@ impl<F: Field> NumericInstructions<F> for FieldChip<F> {
             || "load constant",
             |mut region| {
                 region
-                    .assign_advice_from_constant(|| "constant input", config.advice[0], 0,  constant)
+                    .assign_advice_from_constant(|| "constant input", config.advice[0], 0, constant)
                     .map(Number)
             },
         )
@@ -239,32 +238,36 @@ struct MyCiruit<F: Field> {
     b: Value<F>,
 }
 
-impl<F:Field>Circuit<F> for MyCiruit<F>{
+impl<F: Field> Circuit<F> for MyCiruit<F> {
     type Config = FieldConfig;
-    
+
     /// The floor planner used for this circuit. This is an associated type of the
     /// `Circuit` trait because its behaviour is circuit-critical.
     type FloorPlanner = SimpleFloorPlanner;
-    
+
     /// Returns a copy of this circuit with no witness values (i.e. all witnesses set to
     /// `None`). For most circuits, this will be equal to `Self::default()`.
-    fn without_witnesses(&self) -> Self{
+    fn without_witnesses(&self) -> Self {
         Self::default()
     }
-    
+
     /// The circuit is given an opportunity to describe the exact gate
     /// arrangement, column arrangement, etc.
-    fn configure(meta: &mut ConstraintSystem<F>) -> Self::Config{
+    fn configure(meta: &mut ConstraintSystem<F>) -> Self::Config {
         let advices = [meta.advice_column(), meta.advice_column()];
         let instance = meta.instance_column();
         let constant = meta.fixed_column();
         FieldChip::configure(meta, advices, instance, constant)
     }
-    
+
     /// Given the provided `cs`, synthesize the circuit. The concrete type of
     /// the caller will be different depending on the context, and they may or
     /// may not expect to have a witness present.
-    fn synthesize(&self, config: Self::Config, mut layouter: impl Layouter<F>) -> Result<(), Error>{
+    fn synthesize(
+        &self,
+        config: Self::Config,
+        mut layouter: impl Layouter<F>,
+    ) -> Result<(), Error> {
         let field_chip = FieldChip::<F>::construct(config);
 
         // Load our private values into the circuit.
@@ -284,28 +287,25 @@ impl<F:Field>Circuit<F> for MyCiruit<F>{
         let ab_sq = field_chip.mul(layouter.namespace(|| "ab_sq"), ab.clone(), ab)?;
         let c = field_chip.mul(layouter.namespace(|| "c"), constant, ab_sq)?;
 
-         // Expose the result as a public input to the circuit.
-         field_chip.expose_public(layouter.namespace(|| "expose c"), c, 0)
+        // Expose the result as a public input to the circuit.
+        field_chip.expose_public(layouter.namespace(|| "expose c"), c, 0)
     }
-
 }
 
+use halo2_proofs::{dev::MockProver, pasta::Fp};
 
-
-use halo2_proofs::{dev::MockProver,pasta::Fp};
-
-fn main(){
+fn main() {
     ////  The number of rows in our circuit cannot exceed 2^k. Since our example
     // circuit is very small, we can pick a very small value here.
-    let k = 4;
+    let k = 5;
 
     let constant = Fp::from(7);
 
-    let a = Fp::from(3);
-    let b = Fp::from(5);
-    let c = a * b + constant;
+    let a = Fp::from(2);
+    let b = Fp::from(3);
+    let c = constant * a.square() * b.square();
 
-    let circuit = MyCiruit{
+    let circuit = MyCiruit {
         a: Value::known(a),
         b: Value::known(b),
         constant,
@@ -313,14 +313,32 @@ fn main(){
 
     let mut public_inputs = vec![c];
 
-
     let prover = MockProver::run(k, &circuit, vec![public_inputs.clone()]).unwrap();
     assert_eq!(prover.verify(), Ok(()));
 
-
     // If we try some other public input, the proof will fail!
-    public_inputs[0] +=Fp::one();
+    public_inputs[0] += Fp::one();
     let prover = MockProver::run(k, &circuit, vec![public_inputs]).unwrap();
     assert!(prover.verify().is_err());
 
+    #[cfg(feature = "dev-graph")]
+    {
+        use plotters::prelude::*;
+        let drawing_area = BitMapBackend::new("layout.png", (1024, 768)).into_drawing_area();
+        drawing_area.fill(&WHITE).unwrap();
+        let drawing_area = drawing_area
+            .titled("Example Circuit Layout", ("sans-serif", 60))
+            .unwrap();
+
+        halo2_proofs::dev::CircuitLayout::default()
+            //optionally render only a section of the circuit.
+            .view_width(0..2)
+            .view_height(0..16)
+            //hide labels, which can be useful with smaller areas.
+            .show_labels(false)
+            // Render the circuit onto your area!
+            // The first argument is the size parameter for the circuit.
+            .render(k, &circuit, &drawing_area)
+            .unwrap();
+    }
 }
