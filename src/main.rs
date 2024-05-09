@@ -1,9 +1,9 @@
 use std::marker::PhantomData;
 
 use group::ff::Field;
-
+#[allow(unused)]
 use halo2_proofs::{
-    circuit::{AssignedCell, Chip, Layouter, Region, SimpleFloorPlanner, Value},
+    circuit::{floor_planner::V1, AssignedCell, Chip, Layouter, Region, SimpleFloorPlanner, Value},
     plonk::{Advice, Circuit, Column, ConstraintSystem, Error, Fixed, Instance, Selector},
     poly::Rotation,
 };
@@ -244,6 +244,7 @@ impl<F: Field> Circuit<F> for MyCiruit<F> {
     /// The floor planner used for this circuit. This is an associated type of the
     /// `Circuit` trait because its behaviour is circuit-critical.
     type FloorPlanner = SimpleFloorPlanner;
+    // type FloorPlanner = V1;
 
     /// Returns a copy of this circuit with no witness values (i.e. all witnesses set to
     /// `None`). For most circuits, this will be equal to `Self::default()`.
@@ -327,8 +328,9 @@ fn main() {
     #[cfg(feature = "dev-graph")]
     {
         show_main::plot_fibonacci1();
+
         use plotters::prelude::*;
-        let drawing_area = BitMapBackend::new("layout.png", (1024, 768)).into_drawing_area();
+        let drawing_area = BitMapBackend::new("layout-v1.png", (1024, 768)).into_drawing_area();
         drawing_area.fill(&WHITE).unwrap();
         let drawing_area = drawing_area
             .titled("Example Circuit Layout", ("sans-serif", 60))
