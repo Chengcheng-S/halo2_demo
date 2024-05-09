@@ -4,6 +4,7 @@ use group::ff::Field;
 #[allow(unused)]
 use halo2_proofs::{
     circuit::{floor_planner::V1, AssignedCell, Chip, Layouter, Region, SimpleFloorPlanner, Value},
+    dev::TracingFloorPlanner,
     plonk::{Advice, Circuit, Column, ConstraintSystem, Error, Fixed, Instance, Selector},
     poly::Rotation,
 };
@@ -245,7 +246,7 @@ impl<F: Field> Circuit<F> for MyCiruit<F> {
     /// `Circuit` trait because its behaviour is circuit-critical.
     type FloorPlanner = SimpleFloorPlanner;
     // type FloorPlanner = V1;
-
+    // type FloorPlanner = TracingFloorPlanner<V1>;
     /// Returns a copy of this circuit with no witness values (i.e. all witnesses set to
     /// `None`). For most circuits, this will be equal to `Self::default()`.
     fn without_witnesses(&self) -> Self {
@@ -330,7 +331,10 @@ fn main() {
         show_main::plot_fibonacci1();
 
         use plotters::prelude::*;
-        let drawing_area = BitMapBackend::new("layout-v1.png", (1024, 768)).into_drawing_area();
+        let drawing_area =
+            BitMapBackend::new("layout-simple-floorplanner.png", (1024, 768)).into_drawing_area();
+        // let drawing_area = BitMapBackend::new("layout-v1.png", (1024, 768)).into_drawing_area();
+        // let drawing_area = BitMapBackend::new("layout-trace-v1.png", (1024, 768)).into_drawing_area();
         drawing_area.fill(&WHITE).unwrap();
         let drawing_area = drawing_area
             .titled("Example Circuit Layout", ("sans-serif", 60))
@@ -338,12 +342,12 @@ fn main() {
 
         halo2_proofs::dev::CircuitLayout::default()
             //optionally render only a section of the circuit.
-            .view_width(0..2)
-            .view_height(0..16)
+            // .view_width(0..2)
+            // .view_height(0..16)
             //hide labels, which can be useful with smaller areas.
             .show_labels(true)
             .mark_equality_cells(true)
-            .show_equality_constraints(true)
+            // .show_equality_constraints(true)
             // Render the circuit onto your area!
             // The first argument is the size parameter for the circuit.
             .render(k, &circuit, &drawing_area)
