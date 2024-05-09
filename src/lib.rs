@@ -254,16 +254,17 @@ mod tests {
     fn plot_fibonacci1() {
         use plotters::prelude::*;
 
-        let root = BitMapBackend::new("fib-1-layout.png", (1024, 3096)).into_drawing_area();
+        let root = BitMapBackend::new("./circuit-layouts/fib-1-layout.png", (1024, 3096))
+            .into_drawing_area();
         root.fill(&WHITE).unwrap();
         let root = root.titled("Fib 1 Layout", ("sans-serif", 60)).unwrap();
 
         let circuit = FIBONACircuit::<Fp>(PhantomData);
         halo2_proofs::dev::CircuitLayout::default()
-            .view_width(0..2)
-            .view_height(0..16)
+            // .view_width(0..2)
+            // .view_height(0..16)
             //hide labels, which can be useful with smaller areas.
-            .show_labels(false)
+            .show_labels(true)
             .render(4, &circuit, &root)
             .unwrap();
     }

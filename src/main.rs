@@ -9,6 +9,7 @@ use halo2_proofs::{
     poly::Rotation,
 };
 
+pub mod examples;
 /// load private number into circuit
 /// two number mul
 
@@ -127,7 +128,7 @@ impl<F: Field> FieldChip<F> {
             // - When s_mul = 0, any value is allowed in lhs, rhs, and out.
             // - When s_mul != 0, this constrains lhs * rhs = out.
             //lhs * rhs = out
-            vec![s_mul * (lhs * rhs - out)]
+            Constraints::with_selector(s_mul, vec![lhs * rhs - out])
         });
 
         FieldConfig {
@@ -294,7 +295,7 @@ impl<F: Field> Circuit<F> for MyCiruit<F> {
     }
 }
 
-use halo2_proofs::{dev::MockProver, pasta::Fp};
+use halo2_proofs::{dev::MockProver, pasta::Fp, plonk::Constraints};
 use simple_example::show_main;
 
 fn main() {
@@ -331,8 +332,11 @@ fn main() {
         show_main::plot_fibonacci1();
 
         use plotters::prelude::*;
-        let drawing_area =
-            BitMapBackend::new("layout-simple-floorplanner.png", (1024, 768)).into_drawing_area();
+        let drawing_area = BitMapBackend::new(
+            "./circuit-layouts/layout-simple-floorplanner.png",
+            (1024, 768),
+        )
+        .into_drawing_area();
         // let drawing_area = BitMapBackend::new("layout-v1.png", (1024, 768)).into_drawing_area();
         // let drawing_area = BitMapBackend::new("layout-trace-v1.png", (1024, 768)).into_drawing_area();
         drawing_area.fill(&WHITE).unwrap();
