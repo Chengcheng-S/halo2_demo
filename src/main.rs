@@ -330,7 +330,6 @@ fn main() {
     #[cfg(feature = "dev-graph")]
     {
         // show_main::plot_fibonacci1();
-
         use plotters::prelude::*;
         let drawing_area = BitMapBackend::new(
             "./circuit-layouts/layout-simple-floorplanner.png",
