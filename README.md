@@ -10,6 +10,8 @@ cargo run --release --features dev-graph
 
 run all test && generate circuit layout images
 ```
+
+```shell
 make help
 
 make testgraph
