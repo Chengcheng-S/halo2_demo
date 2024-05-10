@@ -80,7 +80,7 @@ impl<F:Field>SimpleChip<F>{
 
         meta.create_gate("cub", |meta| {
             let lhs = meta.query_advice(advices[0], Rotation::cur());
-            let out = meta.query_advice(advices[1], Rotation::next());
+            let out = meta.query_advice(advices[1], Rotation::cur());
             let s_cub = meta.query_selector(s_cub);
 
             Constraints::with_selector(s_cub, [lhs.clone() * lhs.clone() * lhs.clone() - out])
@@ -280,7 +280,7 @@ mod tests {
     #[test]
     fn plot_chip_circuit() {
         // Instantiate the circuit with the private inputs.
-        let (circuit, c) = circuit();
+        let (circuit, _) = circuit();
         // Create the area you want to draw on.
         // Use SVGBackend if you want to render to .svg instead.
         use plotters::prelude::*;
