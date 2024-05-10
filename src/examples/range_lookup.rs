@@ -47,7 +47,7 @@ impl<F: PrimeField, const RANGE: usize, const NUM: usize> RangeConfig<F, RANGE, 
                 let mut cell = region
                     .assign_advice(|| "value", self.value, 0, || value[0])
                     .map(ACell);
-                for i in 1..value.len() {
+                for (i, _) in value.iter().enumerate().skip(1) {
                     self.q_lookup.enable(&mut region, i)?;
                     cell = region
                         .assign_advice(|| "value", self.value, i, || value[i])
@@ -122,7 +122,7 @@ mod test {
         let prover = MockProver::run(k, &circuit, vec![]).unwrap();
         prover.assert_satisfied();
 
-        values[1] = Value::known(Assigned::from(Fp::from(18 as u64)));
+        values[1] = Value::known(Assigned::from(Fp::from(18_u64)));
         let circuit = MyCircuit::<Fp, 16, NUM> {
             value: values.clone().try_into().unwrap(),
         };

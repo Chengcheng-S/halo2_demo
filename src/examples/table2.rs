@@ -29,13 +29,13 @@ impl<F: PrimeField, const NUM_BITS: usize, const RANGE: usize> RangeCheckTable<F
                     || "n_bits cell",
                     self.n_bits,
                     offset,
-                    || Value::known(F::from(1 as u64)),
+                    || Value::known(F::from(1_u64)),
                 )?;
                 table.assign_cell(
                     || "value cell",
                     self.value,
                     offset,
-                    || Value::known(F::from(0 as u64)),
+                    || Value::known(F::from(0_u64)),
                 )?;
                 offset += 1;
 

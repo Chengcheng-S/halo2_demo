@@ -56,3 +56,11 @@ taplocheck:
 .PHONY: fmt ## cargo fmt all && taplo fmt all
 fmt:
 	cargo fmt --all && taplo fmt
+
+.PHONY: test
+test:
+	cargo test --all
+
+.PHONY: testgraph
+testgraph:
+	cargo test --all --features dev-graph

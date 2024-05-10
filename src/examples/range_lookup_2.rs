@@ -66,7 +66,7 @@ impl<F: PrimeField, const NUM_BITS: usize, const RANGE: usize>
     fn assign(
         &self,
         mut layouter: impl Layouter<F>,
-        values: &Vec<Value<Assigned<F>>>,
+        values: &[Value<Assigned<F>>],
         bits: Vec<Value<F>>,
     ) -> Result<(), Error> {
         layouter.assign_region(
@@ -133,10 +133,7 @@ mod tests {
             }
         }
 
-        RangeCheckCircuit::<Fp, NUM_BITS, 15> {
-            bits,
-            values,
-        }
+        RangeCheckCircuit::<Fp, NUM_BITS, 15> { bits, values }
     }
 
     #[test]

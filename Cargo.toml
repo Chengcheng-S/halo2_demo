@@ -46,4 +46,9 @@ tempfile = ">=3, <3.7.0"  # tempfile 3.7.0 has MSRV 1.63
 getrandom = { version = "0.2", features = ["js"] }
 
 [features]
-dev-graph = ["halo2_proofs/dev-graph", "plotters","plotters/bitmap_backend","plotters/bitmap_encoder"]
+dev-graph = [
+  "halo2_proofs/dev-graph",
+  "plotters",
+  "plotters/bitmap_backend",
+  "plotters/bitmap_encoder",
+]
