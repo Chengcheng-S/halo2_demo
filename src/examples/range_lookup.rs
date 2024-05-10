@@ -133,6 +133,7 @@ mod test {
     #[cfg(feature = "dev-graph")]
     #[test]
     fn lookup_example_graph() {
+        use halo2_proofs::pasta::Fp;
         use plotters::prelude::*;
         let circuit = MyCircuit::<Fp, 16, 3>::default();
 
