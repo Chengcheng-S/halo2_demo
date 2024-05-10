@@ -5,12 +5,13 @@ use group::ff::Field;
 use halo2_proofs::{
     circuit::{floor_planner::V1, AssignedCell, Chip, Layouter, Region, SimpleFloorPlanner, Value},
     dev::TracingFloorPlanner,
-    plonk::{Advice, Circuit, Column, ConstraintSystem, Error, Fixed, Instance, Selector,Constraints},
+    plonk::{
+        Advice, Circuit, Column, ConstraintSystem, Constraints, Error, Fixed, Instance, Selector,
+    },
     poly::Rotation,
 };
 
-  
-// d = a^2  * b^2  *c 
+// d = a^2  * b^2  *c
 //  e = c + d
 // out = e^ 3
 #[derive(Clone, Debug)]
@@ -18,8 +19,8 @@ struct SimpleConfig {
     advice: [Column<Advice>; 2],
     instance: Column<Instance>,
     s_mul: Selector,
-    s_add : Selector,
-    s_cub : Selector,
+    s_add: Selector,
+    s_cub: Selector,
 }
 
 #[derive(Clone)]
@@ -31,8 +32,7 @@ struct SimpleChip<F: Field> {
     _marker: PhantomData<F>,
 }
 
-impl<F:Field>SimpleChip<F>{
-
+impl<F: Field> SimpleChip<F> {
     fn construct(config: SimpleConfig) -> Self {
         Self {
             config,
@@ -40,9 +40,9 @@ impl<F:Field>SimpleChip<F>{
         }
     }
 
-    fn configure(meta: &mut ConstraintSystem<F>)->SimpleConfig{
+    fn configure(meta: &mut ConstraintSystem<F>) -> SimpleConfig {
         let advices = [meta.advice_column(), meta.advice_column()];
-        
+
         let instance = meta.instance_column();
         let constant = meta.fixed_column();
 
@@ -86,7 +86,7 @@ impl<F:Field>SimpleChip<F>{
             Constraints::with_selector(s_cub, [lhs.clone() * lhs.clone() * lhs.clone() - out])
         });
 
-        SimpleConfig{
+        SimpleConfig {
             advice: advices,
             instance,
             s_mul,
@@ -101,25 +101,31 @@ impl<F:Field>SimpleChip<F>{
         a: Value<F>,
         b: Value<F>,
         c: F,
-    )-> Result<Number<F>, Error>{
+    ) -> Result<Number<F>, Error> {
+        let cells = layouter
+            .assign_region(
+                || "load private inputs",
+                |mut region| {
+                    let a_cell = region
+                        .assign_advice(|| "private input a", self.config.advice[0], 0, || a)
+                        .map(Number)?;
 
-        let cells= layouter.assign_region(
-            || "load private inputs",
-            |mut region|{
-                let a_cell = region.assign_advice(
-                    ||"private input a", self.config.advice[0], 0, || a  
-                ).map(Number)?;
+                    let b_cell = region
+                        .assign_advice(|| "private input b", self.config.advice[0], 1, || b)
+                        .map(Number)?;
 
-                let b_cell = region.assign_advice(
-                    ||"private input b", self.config.advice[0], 1, || b  
-                ).map(Number)?;
-
-                let c_cell = region.assign_advice_from_constant(
-                    ||"private input c", self.config.advice[0], 2,  c  
-                ).map(Number)?;
-                Ok((a_cell,b_cell,c_cell))
-            },
-        ).unwrap();
+                    let c_cell = region
+                        .assign_advice_from_constant(
+                            || "private input c",
+                            self.config.advice[0],
+                            2,
+                            c,
+                        )
+                        .map(Number)?;
+                    Ok((a_cell, b_cell, c_cell))
+                },
+            )
+            .unwrap();
 
         layouter.assign_region(
             || "load witness",
@@ -205,7 +211,7 @@ struct SimpleChipCiruit<F: Field> {
     b: Value<F>,
 }
 
-impl<F:Field> Circuit<F> for SimpleChipCiruit<F> {
+impl<F: Field> Circuit<F> for SimpleChipCiruit<F> {
     type Config = SimpleConfig;
     type FloorPlanner = V1;
 
@@ -223,8 +229,13 @@ impl<F:Field> Circuit<F> for SimpleChipCiruit<F> {
         mut layouter: impl Layouter<F>,
     ) -> Result<(), Error> {
         let chip = SimpleChip::construct(config);
-        let out = chip.assign(layouter.namespace(||"simple chip"), self.a, self.b, self.constant)?;
-        chip.expose_public(layouter.namespace(||"expose"), out, 0)
+        let out = chip.assign(
+            layouter.namespace(|| "simple chip"),
+            self.a,
+            self.b,
+            self.constant,
+        )?;
+        chip.expose_public(layouter.namespace(|| "expose"), out, 0)
     }
 }
 
@@ -284,7 +295,8 @@ mod tests {
         // Create the area you want to draw on.
         // Use SVGBackend if you want to render to .svg instead.
         use plotters::prelude::*;
-        let root = BitMapBackend::new("./circuit-layouts/simple_ship.png", (1024, 768)).into_drawing_area();
+        let root = BitMapBackend::new("./circuit-layouts/simple_ship.png", (1024, 768))
+            .into_drawing_area();
         root.fill(&WHITE).unwrap();
         let root = root
             .titled("Simple_ship Circuit chip", ("sans-serif", 60))
