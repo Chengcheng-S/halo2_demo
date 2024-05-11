@@ -9,7 +9,6 @@ use halo2_proofs::{
     poly::Rotation,
 };
 
-pub mod examples;
 /// load private number into circuit
 /// two number mul
 
@@ -296,7 +295,6 @@ impl<F: Field> Circuit<F> for MyCiruit<F> {
 }
 
 use halo2_proofs::{dev::MockProver, pasta::Fp, plonk::Constraints};
-use simple_example::show_main;
 
 fn main() {
     ////  The number of rows in our circuit cannot exceed 2^k. Since our example
@@ -325,8 +323,6 @@ fn main() {
     let prover = MockProver::run(k, &circuit, vec![public_inputs]).unwrap();
     assert!(prover.verify().is_err());
 
-    // fibonacci example
-    show_main::fibonacci_example1();
     #[cfg(feature = "dev-graph")]
     {
         // show_main::plot_fibonacci1();
