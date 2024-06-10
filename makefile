@@ -36,6 +36,9 @@ clippyfix:
 cargofix:
 	cargo fix --allow-dirty --allow-staged --workspace --all-targets --all-features
 
+.PHONY: bacon ##bacon check
+bacon:
+	bacon clippy && bacon test
 
 # toml && lock check
 .PHONY: tomlcheck ## cargo toml check
